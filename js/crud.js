@@ -5,7 +5,7 @@ function todoHtml({userId, id, title, completed}) {
 
 		crudWrapper.insertAdjacentHTML(
 				'afterend',
-				`	<section id="item${id}" class="crud__item" >
+				`	<section id="${id}" class="crud__item" >
 									<h6 class="crud__id">script id: ${id}</h6>
 									<div class="crud__name-wrapper"> 
 										<h3 class="crud__name">script name: ${userId}</h3>
@@ -13,7 +13,7 @@ function todoHtml({userId, id, title, completed}) {
 									</div>
 									<span class="crud__state">state: ${completed}</span>
 									<div class="crud__check-wrapper">
-										<input onchange="toggleTodo(${id})" class="crud__check" id="crud-check" type="checkbox" ${completed && 'checked'}></input>
+										<input onchange="toggleTodo(${id})" class="crud__check" id="crud__check${id}" type="checkbox" ${completed && 'checked'}></input>
 									</div>
 									<div class="crud__post">
 										<input id="crud__post-input" type="text"/>
@@ -51,6 +51,14 @@ document.getElementById('crud__post-btn')
 		})
 
 
+async function getAllTodos() {
+		const result = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=10')
+		const todos = await result.json()
+		console.log(todos)
+		todos.forEach(item => todoHtml(item))
+}
+
+
 async function deleteTodo(id) {
 		const result = await fetch('https://jsonplaceholder.typicode.com/todos/${id}', {
 				method: 'DELETE',
@@ -60,14 +68,13 @@ async function deleteTodo(id) {
 		})
 		const data = await result.json();
 		if (data) {
-				document.getElementById(`#crud__check${id}`).remove()
+				document.getElementById(`${id}`).remove()
 		}
 }
 
-
 async function toggleTodo(id) {
-		const completed = document.getElementById('#crud__check').checked
-		console.log(completed)
+		const completed = document.getElementById(`crud__check${id}`).checked
+		console.log('crud__check')
 
 		const result = await fetch('https://jsonplaceholder.typicode.com/todos/${id}', {
 				method: 'PATCH',
@@ -78,11 +85,4 @@ async function toggleTodo(id) {
 		})
 		const data = await result.json()
 		console.log(data)
-}
-
-async function getAllTodos() {
-		const result = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=1')
-		const todos = await result.json()
-		console.log(todos)
-		todos.forEach(item => todoHtml(item))
 }
